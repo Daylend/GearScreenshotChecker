@@ -1,0 +1,7 @@
+files/
+gear/
+notgear/
+temp/
+.idea/
+*.h5
+*.html
