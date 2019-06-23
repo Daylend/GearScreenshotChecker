@@ -94,7 +94,7 @@ else:
 # Save predictions to file for viewing
 #answers = open("answers.html", "w")
 
-reddit = praw.Reddit(user_agent="Gear Screenshot Detector by /u/Daylend",
+reddit = praw.Reddit(user_agent="Gear Screenshot Detector by /u/Daylend10",
                      client_id="haha", client_secret="nonono",
                      username="ha", password="no")
 subreddit = reddit.subreddit('blackdesertonline')
