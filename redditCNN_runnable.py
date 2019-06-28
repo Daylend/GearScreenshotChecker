@@ -95,14 +95,17 @@ for submission in subreddit.stream.submissions():
             test_image = np.expand_dims(test_image, axis=0)
             result = classifier.predict(test_image)
 
-            if result[0][0] <= 0.1:
+            if result[0][0] == 0.0:
                 # If the file exists, we've already seen the post, so do nothing
                 if not os.path.isfile(gearPath):
                     print(
                         "https://reddit.com" + str(permalink) + " \t\t\t " + str(url) + " \t\t\t " + str(result[0][0]))
                     try:
-                        submission.reply(comment)
-                        submission.mod.remove(spam=False)
+                        # We'll just assume that approved posts shouldn't be removed
+                        if not submission.approved:
+                            reply = submission.reply(comment)
+                            reply.mod.distinguish(how='yes', sticky=True)
+                            submission.mod.remove(spam=False)
                         os.rename(tempPath, gearPath)
                     except:
                         print("Something went wrong! " + sys.exc_info()[0])

@@ -11,12 +11,14 @@ from keras import backend
 import tensorflow as tf
 from pathlib import Path
 import praw
+import praw.exceptions as Exceptions
 import requests
 from io import BytesIO
 from PIL import Image
 import os
+import sys
 
-imageSize = 64
+imageSize = 128
 comment = "Hi there! This post has been removed because it appears to contain a gear screenshot." \
           "\n\nWe receive a high volume of people frequently asking for help on gear progression or grinding spots. " \
           "There are helpful links located at the top of the subreddit, but here are some answers to frequently asked questions:" \
@@ -24,7 +26,7 @@ comment = "Hi there! This post has been removed because it appears to contain a 
           "\n\n[Where should I grind?](https://docs.google.com/spreadsheets/d/1gPOFA0uMh_Xc6_pZ_e7wjXRsmkQ3wDuNmhSqiahlvTw/edit#gid=761402636)" \
           "\n\n\nIf you have any further questions or need more help, feel free to leave a comment in the Daily FAQ thread located at the top of the subreddit.  " \
           "\n\n^(Note: I am a bot, and this feature is currently in beta! Sometimes I make mistakes! My last recorded" \
-          " accuracy is 92% against 350 test examples. If you wish to leave feedback about the bot, feel free to PM)" \
+          " accuracy is 97.5% against 350 test examples. If you wish to leave feedback about the bot, feel free to PM)" \
           " /u/Daylend10 ^(or leave us a message in modmail.)"
 
 # Use GPU
@@ -37,22 +39,48 @@ classifier = Sequential()
 
 # Convolution
 #classifier.add(Convolution2D(int(imageSize/2), 3, 3, input_shape=(imageSize,imageSize,3), activation='relu'))
-classifier.add(Convolution2D(int(imageSize/4), 3, 1, input_shape=(imageSize, imageSize, 3)))
-classifier.add(BatchNormalization(epsilon=0.001))
-classifier.add(Activation("relu"))
+#classifier.add(Convolution2D(int(imageSize/4), 3, 1, input_shape=(imageSize, imageSize, 3)))
+#classifier.add(BatchNormalization(epsilon=0.001))
+classifier.add(Convolution2D(64, kernel_size=(3, 3), activation='relu', input_shape=(imageSize,imageSize, 3)))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(BatchNormalization())
+
+classifier.add(Convolution2D(64, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(BatchNormalization())
+
+classifier.add(Convolution2D(64, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(BatchNormalization())
+
+classifier.add(Convolution2D(128, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(BatchNormalization())
+
+classifier.add(Convolution2D(32, kernel_size=(3, 3), activation='relu'))
+classifier.add(MaxPooling2D(pool_size=(2, 2)))
+classifier.add(BatchNormalization())
+classifier.add(Dropout(0.2))
+
+classifier.add(Flatten())
+classifier.add(Dense(128, activation='relu'))
+classifier.add(Dropout(0.3))
+classifier.add(Dense(64, activation='relu'))
+classifier.add(Dropout(0.2))
+classifier.add(Dense(1, activation='sigmoid'))
 
 # Pooling
-classifier.add(MaxPooling2D(pool_size=(2, 2)))
+#classifier.add(MaxPooling2D(pool_size=(2, 2)))
 
 # Dropout regularization
 #classifier.add(Dropout(0.2))
 
 # Flattening
-classifier.add(Flatten())
+#classifier.add(Flatten())
 
 # "Full connection" whatever that means
-classifier.add(Dense(units=imageSize*2, activation="relu"))
-classifier.add(Dense(units=1, activation="sigmoid"))
+#classifier.add(Dense(units=imageSize*2, activation="relu"))
+#classifier.add(Dense(units=1, activation="sigmoid"))
 
 # compile
 classifier.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
@@ -62,37 +90,43 @@ es = EarlyStopping(monitor="val_acc", mode="auto", patience=100, verbose=1)
 
 mc = ModelCheckpoint("checkpoint.h5", monitor="val_acc", save_best_only=True, mode="max", verbose=1)
 
-# Rescales, translates, zooms, and flips the image to create more training data
-train_datagen = ImageDataGenerator(
-    rescale=1./255,
-    shear_range=0.2,
-    zoom_range=0.2,
-    horizontal_flip=False)
-
-# Rescales test data for more test data
-test_datagen = ImageDataGenerator(rescale=1./255)
-
-# Define training set
-training_set = train_datagen.flow_from_directory(
-    'D:\\HDD Storage\\Pictures\\RedditGear\\Train',
-    target_size=(imageSize,imageSize),
-    batch_size=32,
-    class_mode='binary')
-
-# Define test set
-test_set = train_datagen.flow_from_directory(
-    'D:\\HDD Storage\\Pictures\\RedditGear\\Test',
-    target_size=(imageSize,imageSize),
-    batch_size=32,
-    class_mode='binary')
+# Save model
+#model_json = classifier.to_json()
+#with open("model.json", "w") as json_file:
+#    json_file.write(model_json)
+#print('saved model')
 
 # Optionally load weights, otherwise start training
 loadDataAnswer = input("Load saved weights?")
 if loadDataAnswer == "n":
+    # Rescales, translates, zooms, and flips the image to create more training data
+    train_datagen = ImageDataGenerator(
+        rescale=1. / 255,
+        shear_range=0.2,
+        zoom_range=0.2,
+        horizontal_flip=False)
+
+    # Rescales test data for more test data
+    test_datagen = ImageDataGenerator(rescale=1. / 255)
+
+    # Define training set
+    training_set = train_datagen.flow_from_directory(
+        'D:\\HDD Storage\\Pictures\\RedditGear\\Train',
+        target_size=(imageSize, imageSize),
+        batch_size=32,
+        class_mode='binary')
+
+    # Define test set
+    test_set = train_datagen.flow_from_directory(
+        'D:\\HDD Storage\\Pictures\\RedditGear\\Test',
+        target_size=(imageSize, imageSize),
+        batch_size=32,
+        class_mode='binary')
+
     classifier.fit_generator(
         training_set,
         steps_per_epoch=200,
-        epochs=5,
+        epochs=50,
         validation_data=test_set,
         validation_steps=20,
         callbacks=[es, mc])
@@ -101,9 +135,10 @@ if loadDataAnswer == "n":
 else:
     classifier.load_weights("weights.h5")
 
-test_set.reset()
+#test_set.reset()
 #eval = classifier.evaluate_generator(generator=test_set, steps=10, verbose=1)
 #print(eval)
+
 """
 while(True):
     try:
@@ -120,10 +155,11 @@ while(True):
 """
 
 # Save predictions to file for viewing
-#answers = open("answers.html", "w")
-reddit = praw.Reddit()
+# Stripped down version of redditCNN_runnable for testing
+reddit = praw.Reddit(x)
 #subreddit = reddit.subreddit('2007scape+shittyrobots+awww+softwaregore+mildlyinteresting+blackdesertonline')
 subreddit = reddit.subreddit('blackdesertonline')
+#subreddit = reddit.subreddit('testingground4bots')
 for submission in subreddit.stream.submissions():
     url = submission.url
     permalink = submission.permalink
@@ -161,10 +197,13 @@ for submission in subreddit.stream.submissions():
             if result[0][0] <= 0.1:
                 # If the file exists, we've already seen the post, so do nothing
                 if not os.path.isfile(gearPath):
-                    os.rename(tempPath, gearPath)
                     print(
                         "https://reddit.com" + str(permalink) + " \t\t\t " + str(url) + " \t\t\t " + str(result[0][0]))
-                    print(subreddit.name)
+                    print(subreddit.display_name)
+                    try:
+                        os.rename(tempPath, gearPath)
+                    except:
+                        print("Something went wrong! " + sys.exc_info()[0])
                 else:
                     os.remove(tempPath)
             else:
@@ -172,7 +211,6 @@ for submission in subreddit.stream.submissions():
                     os.rename(tempPath, notGearPath)
                     print(
                         "https://reddit.com" + str(permalink) + " \t\t\t " + str(url) + " \t\t\t " + str(result[0][0]))
-                    print(subreddit.name)
                 else:
                     os.remove(tempPath)
 
