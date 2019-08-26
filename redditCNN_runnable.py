@@ -82,9 +82,9 @@ for submission in subreddit.stream.submissions():
                 os.mkdir("gear")
             if not os.path.exists("notgear"):
                 os.mkdir("notgear")
-            tempPath = Path("temp\\"+filename)
-            gearPath = Path("gear\\"+filename)
-            notGearPath = Path("notgear\\"+filename)
+            tempPath = str(Path("temp/"+filename))
+            gearPath = str(Path("gear/"+filename))
+            notGearPath = str(Path("notgear/"+filename))
 
             newimg = open(tempPath, 'wb')
             newimg.write(img_data)

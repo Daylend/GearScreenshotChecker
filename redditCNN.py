@@ -156,7 +156,7 @@ while(True):
 
 # Save predictions to file for viewing
 # Stripped down version of redditCNN_runnable for testing
-reddit = praw.Reddit(x)
+reddit = x
 #subreddit = reddit.subreddit('2007scape+shittyrobots+awww+softwaregore+mildlyinteresting+blackdesertonline')
 subreddit = reddit.subreddit('blackdesertonline')
 #subreddit = reddit.subreddit('testingground4bots')
@@ -181,9 +181,9 @@ for submission in subreddit.stream.submissions():
                 os.mkdir("gear")
             if not os.path.exists("notgear"):
                 os.mkdir("notgear")
-            tempPath = Path("temp\\"+filename)
-            gearPath = Path("gear\\"+filename)
-            notGearPath = Path("notgear\\"+filename)
+            tempPath = str(Path("temp/"+filename))
+            gearPath = str(Path("gear/"+filename))
+            notGearPath = str(Path("notgear/"+filename))
 
             newimg = open(tempPath, 'wb')
             newimg.write(img_data)
