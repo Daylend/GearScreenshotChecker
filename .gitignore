@@ -5,3 +5,4 @@ temp/
 .idea/
 *.h5
 *.html
+*.json
