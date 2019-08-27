@@ -111,14 +111,14 @@ if loadDataAnswer == "n":
 
     # Define training set
     training_set = train_datagen.flow_from_directory(
-        'D:\\HDD Storage\\Pictures\\RedditGear\\Train',
+        'E:\\HDD Storage\\Pictures\\RedditGear\\Train',
         target_size=(imageSize, imageSize),
         batch_size=32,
         class_mode='binary')
 
     # Define test set
     test_set = train_datagen.flow_from_directory(
-        'D:\\HDD Storage\\Pictures\\RedditGear\\Test',
+        'E:\\HDD Storage\\Pictures\\RedditGear\\Test',
         target_size=(imageSize, imageSize),
         batch_size=32,
         class_mode='binary')
