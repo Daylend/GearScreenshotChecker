@@ -39,10 +39,10 @@ username = os.environ['username']
 password = os.environ['password']
 
 # Use GPU
-gpu_options = tf.GPUOptions(allow_growth=True)
-config = tf.ConfigProto(device_count={'GPU': 1, 'CPU':4}, gpu_options=gpu_options)
-sess = tf.Session(config=config)
-backend.set_session(sess)
+#gpu_options = tf.GPUOptions(allow_growth=True)
+#config = tf.ConfigProto(device_count={'GPU': 1, 'CPU':4}, gpu_options=gpu_options)
+#sess = tf.Session(config=config)
+#backend.set_session(sess)
 
 json_file = open('model.json', 'r')
 loaded_model_json = json_file.read()
