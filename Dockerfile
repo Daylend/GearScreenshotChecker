@@ -5,7 +5,7 @@ ADD https://raw.githubusercontent.com/Daylend/GearScreenshotChecker/master/model
 ADD https://raw.githubusercontent.com/Daylend/GearScreenshotChecker/master/weights.h5 /
 
 RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends python3-numpy python3-scipy cython3 python3-h5py python3-grpcio python3-pip python3-setuptools -y && \
-    pip3 install --no-cache-dir pillow praw requests keras tensorflow && \
+    pip3 install --no-cache-dir pillow praw requests keras tensorflow==1.13.2 && \
     # Cleanup
     apt-get remove python3-pip python3-setuptools -y && \
     apt-get autoremove -y && \
