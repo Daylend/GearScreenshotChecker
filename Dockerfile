@@ -1,17 +1,22 @@
-FROM python:3.7-alpine
-RUN apk update && apk add --no-cache python3
-ADD redditCNN_runnable.py /
-ADD model.json /
-ADD weights.h5 /
+FROM debian:10
 
-#RUN package installer if you need more dependant softare for your app
-#apk add --no-cache bash nodejs shadow #etc #etc
+ADD https://raw.githubusercontent.com/Daylend/GearScreenshotChecker/master/redditCNN_runnable.py /
+ADD https://raw.githubusercontent.com/Daylend/GearScreenshotChecker/master/model.json /
+ADD https://raw.githubusercontent.com/Daylend/GearScreenshotChecker/master/weights.h5 /
 
-RUN pip3 install pillow praw requests tensorflow keras numpy
+RUN apt update && DEBIAN_FRONTEND=noninteractive apt install --no-install-recommends python3-numpy python3-scipy cython3 python3-h5py python3-grpcio python3-pip python3-setuptools -y && \
+    pip3 install --no-cache-dir pillow praw requests keras tensorflow && \
+    # Cleanup
+    apt-get remove python3-pip python3-setuptools -y && \
+    apt-get autoremove -y && \
+    apt-get autoclean -y && \
+    apt-get clean -y && \
+    apt-get purge -y && \
+    rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
 ENV clientid=id \
-    clientsecret=secret \
-    username=username \
-    password=password
+clientsecret=secret \
+username=username \
+password=password
 
-CMD python3 redditCNN_runnable.py
+CMD python3 redditCNN_runnable.py 
