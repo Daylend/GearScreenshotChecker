@@ -1,5 +1,5 @@
-FROM alpine:3.10
-RUN apk add --no-cache python3
+FROM python:3.7-alpine
+RUN apk update && apk add --no-cache python3
 ADD redditCNN_runnable.py /
 ADD model.json /
 ADD weights.h5 /
