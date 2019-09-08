@@ -12,6 +12,6 @@ RUN pip3 install pillow praw requests tensorflow keras numpy
 ENV clientid=id \
     clientsecret=secret \
     username=username \
-    password=password \
+    password=password
 
 CMD python3 redditCNN_runnable.py
