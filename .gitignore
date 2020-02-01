@@ -4,6 +4,5 @@ notgear/
 temp/
 .idea/
 venv/
-*.h5
 *.html
-*.json
+praw.ini

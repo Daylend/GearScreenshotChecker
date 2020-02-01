@@ -27,8 +27,8 @@ comment = "Hi there! This post has been removed because it appears to contain a 
           "\n\n[Where should I grind?](https://docs.google.com/spreadsheets/d/1gPOFA0uMh_Xc6_pZ_e7wjXRsmkQ3wDuNmhSqiahlvTw/edit#gid=761402636)" \
           "\n\n\nIf you have any further questions or need more help, feel free to leave a comment in the Daily FAQ thread located at the top of the subreddit.  " \
           "\n\n^(Note: I am a bot, and this feature is currently in beta! Sometimes I make mistakes! My last recorded" \
-          " accuracy is 97.5% against 350 test examples. If you wish to leave feedback about the bot, feel free to PM)" \
-          " /u/Daylend10 ^(or leave us a message in modmail.)"
+          " accuracy is 97.5% against 350 test examples. If you wish to leave feedback about the bot, feel free to " \
+          "leave a message in modmail or PM /u/Daylend10)"
 
 # Use GPU
 gpu_options = tf.GPUOptions(allow_growth=True)
@@ -60,7 +60,7 @@ while(True):
 print("Checking Reddit now")
 
 # Save predictions to file for viewing
-reddit = praw.Reddit(x)
+reddit = praw.Reddit('bdobot', user_agent='BDO Bot')
 subreddit = reddit.subreddit('blackdesertonline')
 for submission in subreddit.stream.submissions():
     url = submission.url
